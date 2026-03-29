@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Philippe Ciuciu — CEA Fellow & Research Director</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f7f5f0;
+      --surface: #ffffff;
+      --border: #ddd9d0;
+      --accent: #1a4a6b;
+      --accent2: #c0392b;
+      --text: #1c1c1c;
+      --muted: #666;
+      --tag-bg: #e8f0f7;
+      --tag-text: #1a4a6b;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--accent);
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      padding: 0 2rem;
+    }
+    nav a {
+      color: rgba(255,255,255,0.8);
+      text-decoration: none;
+      padding: 0.85rem 1.25rem;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.2s, background 0.2s;
+      border-bottom: 3px solid transparent;
+    }
+    nav a:hover {
+      color: #fff;
+      border-bottom-color: #c0392b;
+    }
+
+    /* ── HERO ── */
+    header {
+      background: linear-gradient(135deg, #0d2f47 0%, #1a4a6b 60%, #1e5f8a 100%);
+      color: white;
+      padding: 5rem 2rem 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 380px; height: 380px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    header::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: -40px;
+      width: 260px; height: 260px;
+      border-radius: 50%;
+      background: rgba(192,57,43,0.12);
+    }
+    .hero-inner {
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .avatar {
+      width: 110px; height: 110px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 3px solid rgba(255,255,255,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'EB Garamond', serif;
+      font-size: 2.8rem;
+      color: white;
+      flex-shrink: 0;
+    }
+    .hero-text h1 {
+      font-family: 'EB Garamond', serif;
+      font-size: 2.6rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+      line-height: 1.15;
+      margin-bottom: 0.3rem;
+    }
+    .hero-text .title {
+      font-size: 1rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 0.15rem;
+    }
+    .hero-text .affiliation {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.55);
+      font-family: 'DM Mono', monospace;
+    }
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 2rem;
+    }
+    .hero-links a {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1rem;
+      border-radius: 3px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: white;
+      color: var(--accent);
+    }
+    .btn-primary:hover { background: #e8f0f7; }
+    .btn-outline {
+      border: 1.5px solid rgba(255,255,255,0.4);
+      color: white;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.1); }
+    .hero-metrics {
+      display: flex;
+      gap: 2.5rem;
+      margin-top: 2.5rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.15);
+      flex-wrap: wrap;
+    }
+    .metric { text-align: left; }
+    .metric .val {
+      font-family: 'EB Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: white;
+      line-height: 1;
+    }
+    .metric .lbl {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.55);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── LAYOUT ── */
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 2.5rem;
+      align-items: start;
+    }
+    @media (max-width: 720px) {
+      main { grid-template-columns: 1fr; }
+      nav { flex-wrap: wrap; }
+    }
+    .col-main { min-width: 0; }
+    .col-side { min-width: 0; }
+
+    /* ── SECTIONS ── */
+    section { margin-bottom: 3rem; }
+    .section-title {
+      font-family: 'EB Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Bio */
+    .bio-text {
+      font-size: 0.97rem;
+      line-height: 1.8;
+      color: #333;
+    }
+    .bio-text p + p { margin-top: 0.8rem; }
+
+    /* Tags */
+    .tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+    .tag {
+      background: var(--tag-bg);
+      color: var(--tag-text);
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.65rem;
+      border-radius: 2px;
+      letter-spacing: 0.03em;
+    }
+
+    /* Experience timeline */
+    .timeline { list-style: none; }
+    .timeline li {
+      position: relative;
+      padding: 0 0 1.6rem 1.4rem;
+      border-left: 2px solid var(--border);
+    }
+    .timeline li:last-child { border-left: 2px solid transparent; padding-bottom: 0; }
+    .timeline li::before {
+      content: '';
+      position: absolute;
+      left: -5px; top: 6px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+    .timeline li.current::before { background: var(--accent2); }
+    .job-header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.3rem; }
+    .job-title { font-weight: 600; font-size: 0.95rem; }
+    .job-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .job-org { color: var(--accent); font-size: 0.85rem; font-weight: 500; margin-bottom: 0.4rem; }
+    .job-desc { font-size: 0.88rem; color: #444; line-height: 1.65; }
+
+    /* Publications */
+    .pub-list { list-style: none; }
+    .pub-list li {
+      padding: 0.9rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.88rem;
+      line-height: 1.65;
+    }
+    .pub-list li:last-child { border-bottom: none; }
+    .pub-year {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--accent2);
+      margin-bottom: 0.15rem;
+    }
+    .pub-authors { color: var(--muted); font-size: 0.82rem; }
+    .pub-venue { font-style: italic; color: var(--accent); font-size: 0.82rem; }
+
+    /* Projects */
+    .projects-grid { display: grid; gap: 1rem; }
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 1rem 1.2rem;
+      border-radius: 3px;
+      transition: box-shadow 0.2s;
+    }
+    .project-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.07); }
+    .project-name {
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+      font-size: 0.88rem;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+    }
+    .project-name a { color: inherit; text-decoration: none; }
+    .project-name a:hover { text-decoration: underline; }
+    .project-desc { font-size: 0.83rem; color: #555; line-height: 1.55; }
+    .project-meta { display: flex; gap: 0.75rem; margin-top: 0.5rem; align-items: center; }
+    .project-star {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .lang-dot {
+      display: inline-block;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #3572A5;
+      margin-right: 3px;
+    }
+    .lang-label { font-size: 0.75rem; color: var(--muted); }
+
+    /* Sidebar cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .card-title {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+    .contact-list { list-style: none; }
+    .contact-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.84rem;
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .contact-list li:last-child { border-bottom: none; }
+    .contact-list a { color: var(--accent); text-decoration: none; }
+    .contact-list a:hover { text-decoration: underline; }
+    .icon { font-size: 1rem; width: 18px; text-align: center; }
+
+    .skills-list { list-style: none; }
+    .skills-list li {
+      font-size: 0.83rem;
+      padding: 0.3rem 0;
+      color: #444;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .skills-list li::before {
+      content: '▪';
+      color: var(--accent);
+      font-size: 0.65rem;
+    }
+
+    .funding-list { list-style: none; }
+    .funding-list li {
+      font-size: 0.82rem;
+      padding: 0.4rem 0;
+      border-bottom: 1px solid var(--border);
+      line-height: 1.5;
+    }
+    .funding-list li:last-child { border-bottom: none; }
+    .funding-date {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--accent2);
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+    }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .hero-text { animation: fadeUp 0.6s ease both; }
+    .hero-links { animation: fadeUp 0.6s 0.15s ease both; }
+    .hero-metrics { animation: fadeUp 0.6s 0.3s ease both; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#about">About</a>
+  <a href="#experience">Experience</a>
+  <a href="#publications">Publications</a>
+  <a href="#projects">Projects</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<!-- HERO -->
+<header>
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="avatar">PC</div>
+      <div class="hero-text">
+        <h1>Philippe Ciuciu</h1>
+        <p class="title">CEA Fellow &amp; Research Director · Head of MIND Team</p>
+        <p class="affiliation">CEA Saclay / NeuroSpin · Inria Saclay · Gif-sur-Yvette, France</p>
+      </div>
+    </div>
+    <div class="hero-links">
+      <a href="https://scholar.google.com/citations?user=Philippe+Ciuciu" class="btn-primary" target="_blank">📚 Google Scholar</a>
+      <a href="https://orcid.org/0000-0001-5374-962X" class="btn-outline" target="_blank">ORCID</a>
+      <a href="https://github.com/philouc" class="btn-outline" target="_blank">GitHub</a>
+      <a href="https://www.linkedin.com/in/philippe-ciuciu-7747a418" class="btn-outline" target="_blank">LinkedIn</a>
+      <a href="https://twitter.com/Philippe_Ciuciu" class="btn-outline" target="_blank">𝕏 Twitter</a>
+    </div>
+    <div class="hero-metrics">
+      <div class="metric"><div class="val">80+</div><div class="lbl">Journal Articles</div></div>
+      <div class="metric"><div class="val">40</div><div class="lbl">H-index</div></div>
+      <div class="metric"><div class="val">8</div><div class="lbl">Patents</div></div>
+      <div class="metric"><div class="val">€13.2M</div><div class="lbl">Research Funding</div></div>
+      <div class="metric"><div class="val">84</div><div class="lbl">Researchers Mentored</div></div>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<main>
+  <div class="col-main">
+
+    <!-- ABOUT -->
+    <section id="about">
+      <h2 class="section-title">About</h2>
+      <div class="bio-text">
+        <p>I am a CEA Fellow and Research Director leading the <strong>MIND Team</strong> (40 researchers, 6 PIs) at NeuroSpin and Inria Saclay. My research spans over 25 years at the intersection of Applied Mathematics, Signal Processing, Medical Imaging (MRI, PET, MEG/EEG), and AI/Deep Learning for neuroimaging.</p>
+        <p>I am best known for co-developing <strong>SPARKLING</strong>, a multi-patented MRI technology that dramatically accelerates 2D/3D imaging on clinical 3T and ultra-high-field 7T scanners, and for directing deep learning reconstruction frameworks (XPDNet, NC-PDNet) that achieved a <strong>global top ranking</strong> in the FAIR &amp; NYU fastMRI Brain Challenge (2020).</p>
+        <p>I am passionate about translating fundamental mathematical research into clinical impact — from epilepsy mapping and fMRI simulation to high-resolution MRI reconstruction with AI.</p>
+      </div>
+      <div class="tags">
+        <span class="tag">MRI Reconstruction</span>
+        <span class="tag">Compressed Sensing</span>
+        <span class="tag">Deep Learning</span>
+        <span class="tag">Neuroimaging</span>
+        <span class="tag">Signal Processing</span>
+        <span class="tag">fMRI</span>
+        <span class="tag">K-space Trajectories</span>
+        <span class="tag">Epilepsy</span>
+        <span class="tag">PyTorch</span>
+        <span class="tag">HPC</span>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section id="experience">
+      <h2 class="section-title">Experience</h2>
+      <ul class="timeline">
+        <li class="current">
+          <div class="job-header">
+            <span class="job-title">CEA Fellow &amp; Director</span>
+            <span class="job-date">2022 – Present</span>
+          </div>
+          <div class="job-org">Inria-CEA MIND Team · NeuroSpin &amp; Inria Saclay</div>
+          <div class="job-desc">Leading a 40-person team (6 PIs). Partnered with Siemens-Healthineers AI Dept. (Princeton) for scalable deep learning 3D MRI reconstruction at 3T/7T. Developed large-scale neural mass simulations for epilepsy mapping. Supervised 15+ researchers with placements at Mistral AI, Meta, Chipiron and academia.</div>
+        </li>
+        <li>
+          <div class="job-header">
+            <span class="job-title">Head of Compressed Sensing Group</span>
+            <span class="job-date">2014 – 2021</span>
+          </div>
+          <div class="job-org">Inria-CEA Parietal · NeuroSpin</div>
+          <div class="job-desc">Led R&D of multi-patented SPARKLING MRI technology. Architected XPDNet and NC-PDNet deep learning frameworks. Supervised the first French PhD finalist for the I.I. Rabi Young Scientist Award at ISMRM 2019.</div>
+        </li>
+        <li>
+          <div class="job-header">
+            <span class="job-title">Visiting Scientist</span>
+            <span class="job-date">2013</span>
+          </div>
+          <div class="job-org">NIH Bethesda, MD, USA</div>
+          <div class="job-desc">Demonstrated scale-free, scale-invariant dynamics in functional connectivity of the human brain (Ciuciu et al., NeuroImage 2014).</div>
+        </li>
+        <li>
+          <div class="job-header">
+            <span class="job-title">Invited Professor</span>
+            <span class="job-date">2012 – 2013</span>
+          </div>
+          <div class="job-org">University of Toulouse</div>
+          <div class="job-desc">Established a pioneering framework for Compressive Sampling, providing the theoretical foundation for variable-density trajectories in clinical MRI (Chauffert et al., SIAMIS 2014).</div>
+        </li>
+        <li>
+          <div class="job-header">
+            <span class="job-title">CEA Senior Research Scientist</span>
+            <span class="job-date">2007 – 2012</span>
+          </div>
+          <div class="job-org">NeuroSpin</div>
+          <div class="job-desc">Directed €1.2M industrial partnerships with Servier and Pierre Fabre. Oversaw Phase-I clinical trials for Alzheimer's and MS. Core developer of open-source PyHRF.</div>
+        </li>
+        <li>
+          <div class="job-header">
+            <span class="job-title">CEA Junior Research Scientist</span>
+            <span class="job-date">2002 – 2006</span>
+          </div>
+          <div class="job-org">SHFJ Orsay</div>
+          <div class="job-desc">Developed novel Bayesian methods for HRF estimation from fMRI data; core developer of HRF Toolbox integrated with SPM.</div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- PUBLICATIONS -->
+    <section id="publications">
+      <h2 class="section-title">Selected Recent Publications</h2>
+      <ul class="pub-list">
+        <li>
+          <div class="pub-year">2026</div>
+          <strong>Multifractality in critical neural field dynamics.</strong><br/>
+          <span class="pub-authors">Dumeur M et al.</span> &nbsp;·&nbsp; <span class="pub-venue">Physical Review E</span>
+        </li>
+        <li>
+          <div class="pub-year">2026</div>
+          <strong>Toward Unified Biomarkers for Focal Epilepsy.</strong><br/>
+          <span class="pub-authors">Wang SH et al.</span> &nbsp;·&nbsp; <span class="pub-venue">Journal of Neuroscience</span>
+        </li>
+        <li>
+          <div class="pub-year">2025</div>
+          <strong>SNAKE: Modular realistic fMRI data simulator.</strong><br/>
+          <span class="pub-authors">Comby PA et al.</span> &nbsp;·&nbsp; <span class="pub-venue">Imaging Neuroscience</span>
+        </li>
+        <li>
+          <div class="pub-year">2025</div>
+          <strong>MRI-NUFFT: Non-Cartesian MRI made easy.</strong><br/>
+          <span class="pub-authors">Comby PA et al.</span> &nbsp;·&nbsp; <span class="pub-venue">Journal of Open Source Software</span>
+        </li>
+        <li>
+          <div class="pub-year">2024</div>
+          <strong>Impact of B0 correction on BOLD sensitivity in 3D-SPARKLING fMRI.</strong><br/>
+          <span class="pub-authors">Amor Z et al.</span> &nbsp;·&nbsp; <span class="pub-venue">Magnetic Resonance in Medicine</span>
+        </li>
+        <li>
+          <div class="pub-year">2024</div>
+          <strong>Neuronal synchrony and critical bistability biomarkers.</strong><br/>
+          <span class="pub-authors">Wang SH et al.</span> &nbsp;·&nbsp; <span class="pub-venue">Epilepsia</span>
+        </li>
+        <li>
+          <div class="pub-year">2023</div>
+          <strong>Jointly learning k-space trajectories and reconstruction.</strong><br/>
+          <span class="pub-authors">Radhakrishna CG &amp; Ciuciu P.</span> &nbsp;·&nbsp; <span class="pub-venue">Bioengineering</span>
+        </li>
+        <li>
+          <div class="pub-year">2022</div>
+          <strong>NC-PDNet: Density-compensated unrolled network.</strong><br/>
+          <span class="pub-authors">Ramzi Z et al.</span> &nbsp;·&nbsp; <span class="pub-venue">IEEE Transactions on Medical Imaging</span>
+        </li>
+        <li>
+          <div class="pub-year">2021</div>
+          <strong>Results of 2020 fastMRI Brain Challenge. <em>(2nd place globally)</em></strong><br/>
+          <span class="pub-authors">Muckley MJ et al.</span> &nbsp;·&nbsp; <span class="pub-venue">IEEE Transactions on Medical Imaging</span>
+        </li>
+      </ul>
+      <p style="margin-top:1rem; font-size:0.83rem; color:var(--muted);">
+        Full list: <a href="https://scholar.google.com/citations?user=Philippe+Ciuciu" target="_blank" style="color:var(--accent);">Google Scholar</a> · 80 journal articles, 230 conference papers, H-index 40
+      </p>
+    </section>
+
+    <!-- PROJECTS -->
+    <section id="projects">
+      <h2 class="section-title">Open-Source Projects</h2>
+      <div class="projects-grid">
+        <div class="project-card">
+          <div class="project-name"><a href="https://github.com/mind-inria/mri-nufft" target="_blank">MRI-NUFFT</a></div>
+          <div class="project-desc">Non-Uniform FFT library for non-Cartesian MRI acquisition and reconstruction. Simple, efficient, and GPU-accelerated.</div>
+          <div class="project-meta">
+            <span class="project-star">⭐ 106</span>
+            <span><span class="lang-dot"></span><span class="lang-label">Python</span></span>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-name"><a href="https://github.com/CEA-COSMIC/pysap" target="_blank">PySAP</a></div>
+          <div class="project-desc">Python Sparse data Analysis Package — a common tool for astrophysics and neuroimaging compressed sensing.</div>
+          <div class="project-meta">
+            <span class="project-star">⭐ 57</span>
+            <span><span class="lang-dot"></span><span class="lang-label">Python</span></span>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-name"><a href="https://github.com/pyhrf/pyhrf" target="_blank">PyHRF</a></div>
+          <div class="project-desc">Tools to analyze fMRI data and study hemodynamics, including joint detection-estimation of evoked brain activity.</div>
+          <div class="project-meta">
+            <span class="project-star">⭐ 29</span>
+            <span><span class="lang-dot"></span><span class="lang-label">Python</span></span>
+          </div>
+        </div>
+        <div class="project-card">
+          <div class="project-name"><a href="https://github.com/mind-inria/snake-fmri" target="_blank">SNAKE-fMRI</a></div>
+          <div class="project-desc">Modular, realistic fMRI data simulator for benchmarking reconstruction and analysis pipelines.</div>
+          <div class="project-meta">
+            <span class="project-star">⭐ 19</span>
+            <span><span class="lang-dot"></span><span class="lang-label">Python</span></span>
+          </div>
+        </div>
+        <div class="project-card" style="border-left-color: var(--accent2);">
+          <div class="project-name"><a href="https://github.com/philouc/mri_acq_recon_tutorial" target="_blank">mri_acq_recon_tutorial</a></div>
+          <div class="project-desc">Tutorial materials from ISBI'19 on MRI acquisition and reconstruction. Jupyter notebooks, hands-on exercises.</div>
+          <div class="project-meta">
+            <span class="project-star">⭐ 36</span>
+            <span><span class="lang-dot" style="background:#f1e05a;"></span><span class="lang-label">Jupyter Notebook</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /col-main -->
+
+  <!-- SIDEBAR -->
+  <aside class="col-side" id="contact">
+
+    <div class="card">
+      <div class="card-title">Contact &amp; Links</div>
+      <ul class="contact-list">
+        <li>
+          <span class="icon">✉️</span>
+          <a href="mailto:philippe.ciuciu@cea.fr">philippe.ciuciu@cea.fr</a>
+        </li>
+        <li>
+          <span class="icon">📍</span>
+          <span>NeuroSpin, Bât 145, CEA Saclay<br/>91191 Gif-sur-Yvette, FR</span>
+        </li>
+        <li>
+          <span class="icon">🔗</span>
+          <a href="https://www.linkedin.com/in/philippe-ciuciu-7747a418" target="_blank">LinkedIn</a>
+        </li>
+        <li>
+          <span class="icon">𝕏</span>
+          <a href="https://twitter.com/Philippe_Ciuciu" target="_blank">@Philippe_Ciuciu</a>
+        </li>
+        <li>
+          <span class="icon">🐙</span>
+          <a href="https://github.com/philouc" target="_blank">github.com/philouc</a>
+        </li>
+        <li>
+          <span class="icon">🆔</span>
+          <a href="https://orcid.org/0000-0001-5374-962X" target="_blank">ORCID</a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Computing Skills</div>
+      <ul class="skills-list">
+        <li>Python, MATLAB, C/C++</li>
+        <li>PyTorch, scikit-learn</li>
+        <li>HPC / Slurm</li>
+        <li>Multi-GPU training</li>
+        <li>Signal & Image Processing</li>
+        <li>Statistical Modeling</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Languages</div>
+      <ul class="skills-list">
+        <li>French (native)</li>
+        <li>English (C1)</li>
+        <li>German (B2)</li>
+        <li>Portuguese (A2)</li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Selected Grants</div>
+      <ul class="funding-list">
+        <li>
+          <div class="funding-date">2024–29</div>
+          <strong>BrainSync</strong> – AI, neuroscience, motor rehab (€5M)
+        </li>
+        <li>
+          <div class="funding-date">2025–28</div>
+          <strong>AIDAS</strong> – HPC for Neuroimaging (€120K/yr)
+        </li>
+        <li>
+          <div class="funding-date">2025–27</div>
+          <strong>K-SPARK</strong> – AI-Powered Brain MRI (€200K)
+        </li>
+        <li>
+          <div class="funding-date">2023–26</div>
+          <strong>BlueSky</strong> – Brain &amp; Numerics (€1.5M)
+        </li>
+        <li>
+          <div class="funding-date">2025–29</div>
+          <strong>ANR VLF-Stroke</strong> (€900K)
+        </li>
+      </ul>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Mentoring Record</div>
+      <ul class="skills-list">
+        <li>12 Postdocs (3 current)</li>
+        <li>24 PhD candidates (5 current)</li>
+        <li>36 MSc students</li>
+        <li>12 Research engineers</li>
+      </ul>
+    </div>
+
+  </aside>
+</main>
+
+<footer>
+  <p>Philippe Ciuciu · CEA Saclay / NeuroSpin · <a href="mailto:philippe.ciuciu@cea.fr" style="color:var(--accent);">philippe.ciuciu@cea.fr</a></p>
+  <p style="margin-top:0.3rem;">Last updated: March 2026</p>
+</footer>
+
+</body>
+</html>

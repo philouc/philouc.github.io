@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOTIF-STROKE — Démo paradigme moteur</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:     #1a1a1a;
+    --panel:  #242424;
+    --border: #333;
+    --accent: #fa9619;
+    --blue:   #19b1fa;
+    --text:   #e8e8e8;
+    --muted:  #888;
+    --green:  #4caf82;
+    --red:    #e05a5a;
+  }
+
+  html, body { height:100%; background:var(--bg); color:var(--text);
+    font-family:'DM Mono',monospace; font-size:13px; overflow:hidden; }
+
+  #app { display:grid; grid-template-columns:272px 1fr;
+    grid-template-rows:48px 1fr; height:100vh; }
+
+  #header { grid-column:1/-1; background:var(--panel);
+    border-bottom:1px solid var(--border);
+    display:flex; align-items:center; gap:14px; padding:0 20px; }
+  .logo { font-family:'Syne',sans-serif; font-weight:800; font-size:15px;
+    letter-spacing:.04em; color:var(--accent); }
+  .hsep { color:var(--border); }
+  .hsub { font-size:11px; color:var(--muted); letter-spacing:.08em; text-transform:uppercase; }
+  .htag { margin-left:auto; font-size:10px; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--muted); border:1px solid var(--border); padding:2px 8px; border-radius:2px; }
+  #gp-status { font-size:10px; padding:3px 8px; border-radius:2px;
+    border:1px solid var(--border); color:var(--muted); }
+  #gp-status.on { border-color:var(--green); color:var(--green); }
+
+  #sidebar { background:var(--panel); border-right:1px solid var(--border);
+    padding:14px; display:flex; flex-direction:column; gap:12px; overflow-y:auto; }
+  .sec { display:flex; flex-direction:column; gap:8px; }
+  .sec-lbl { font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--muted); padding-bottom:4px; border-bottom:1px solid var(--border); }
+
+  #badge { font-family:'Syne',sans-serif; font-weight:600; font-size:12px;
+    letter-spacing:.06em; text-transform:uppercase;
+    padding:6px 10px; border-radius:3px; text-align:center;
+    background:var(--bg); border:1px solid var(--border); color:var(--muted); }
+  #badge.reach  { border-color:var(--accent); color:var(--accent); }
+  #badge.dwell  { border-color:var(--blue);   color:var(--blue); }
+  #badge.return { border-color:#fff;           color:#fff; }
+  #badge.pause  { border-color:var(--border);  color:var(--muted); }
+  #badge.done   { border-color:var(--green);   color:var(--green); }
+
+  .score-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .sbox { background:var(--bg); border:1px solid var(--border);
+    border-radius:4px; padding:8px; text-align:center; }
+  .sval { font-family:'Syne',sans-serif; font-weight:700; font-size:22px; }
+  .slbl { font-size:9px; color:var(--muted); text-transform:uppercase;
+    letter-spacing:.08em; margin-top:2px; }
+
+  .prow { display:flex; justify-content:space-between; }
+  .pname { color:var(--muted); font-size:11px; }
+  .pval  { font-size:11px; }
+
+  .ctrl { display:flex; flex-direction:column; gap:4px; }
+  .ctrl-hdr { display:flex; justify-content:space-between; }
+  .ctrl-name { font-size:11px; color:var(--muted); }
+  .ctrl-val  { font-size:11px; }
+  input[type=range] { width:100%; accent-color:var(--accent); cursor:pointer; }
+
+  .trow { display:flex; justify-content:space-between; align-items:center; }
+  .tname { font-size:11px; color:var(--muted); }
+  .tog { width:32px; height:16px; border-radius:8px; background:var(--border);
+    cursor:pointer; position:relative; transition:background .2s; }
+  .tog.on { background:var(--accent); }
+  .tog::after { content:''; position:absolute; top:2px; left:2px;
+    width:12px; height:12px; border-radius:50%;
+    background:#fff; transition:left .2s; }
+  .tog.on::after { left:18px; }
+
+  .btn { font-family:'DM Mono',monospace; font-size:12px; letter-spacing:.06em;
+    text-transform:uppercase; padding:8px 12px; border-radius:3px;
+    cursor:pointer; border:1px solid; transition:all .15s; }
+  .btn-p { background:var(--accent); border-color:var(--accent); color:#000; font-weight:500; }
+  .btn-p:hover { background:#e88510; }
+  .btn-g { background:transparent; border-color:var(--border); color:var(--muted); }
+  .btn-g:hover { border-color:var(--text); color:var(--text); }
+  .brow { display:flex; gap:8px; }
+
+  #pips { display:flex; gap:6px; justify-content:center; }
+  .pip { width:8px; height:8px; border-radius:50%; background:var(--border); }
+  .pip.active  { background:var(--text); }
+  .pip.success { background:var(--green); }
+  .pip.partial { background:var(--accent); }
+  .pip.fail    { background:var(--red); }
+
+  #prog-wrap { display:flex; flex-direction:column; gap:4px; }
+  #prog-lbl  { font-size:10px; color:var(--muted); }
+  #prog-track { height:2px; background:var(--border); border-radius:1px; overflow:hidden; }
+  #prog-fill  { height:100%; background:var(--accent); width:0%; }
+
+  #phase-bar-wrap { display:flex; flex-direction:column; gap:4px; }
+  #phase-lbl   { font-size:10px; color:var(--muted); }
+  #phase-track { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+  #phase-fill  { height:100%; width:100%; }
+
+  #log { background:var(--bg); border:1px solid var(--border); border-radius:4px;
+    padding:8px; font-size:10px; color:var(--muted);
+    height:100px; overflow-y:auto; flex:1; min-height:60px;
+    display:flex; flex-direction:column-reverse; }
+  .le { padding:1px 0; }
+  .le .t  { color:var(--border); margin-right:6px; }
+  .le.ok  .m { color:var(--green); }
+  .le.err .m { color:var(--red); }
+  .le.inf .m { color:var(--accent); }
+  .le.ast .m { color:var(--blue); }
+
+  #canvas-area { position:relative; display:flex; align-items:center;
+    justify-content:center; background:var(--bg); overflow:hidden; }
+  #gc { border:1px solid var(--border); cursor:none; display:block; }
+
+  #hud { position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
+    width:480px; display:flex; flex-direction:column; gap:6px; pointer-events:none; }
+
+  #overlay { position:absolute; inset:0; background:rgba(26,26,26,.93);
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:20px; z-index:10; }
+  #overlay.hidden { display:none; }
+  .ov-title { font-family:'Syne',sans-serif; font-weight:800; font-size:26px; color:var(--text); }
+  .ov-sub { font-size:12px; color:var(--muted); text-align:center; line-height:1.9; max-width:380px; }
+  .ov-hint { font-size:11px; color:var(--muted);
+    border:1px solid var(--border); padding:6px 16px; border-radius:2px; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header id="header">
+    <span class="logo">MOTIF-STROKE</span>
+    <span class="hsep">|</span>
+    <span class="hsub">Paradigme moteur — démo</span>
+    <span id="gp-status">🖱 souris</span>
+    <span class="htag">Démo</span>
+  </header>
+
+  <aside id="sidebar">
+    <div class="sec">
+      <div class="sec-lbl">État</div>
+      <div id="badge">En attente</div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-lbl">Scores</div>
+      <div class="score-grid">
+        <div class="sbox">
+          <div class="sval" id="sc-s" style="color:var(--green)">0</div>
+          <div class="slbl">Success<br><span style="font-size:8px">cible + retour</span></div>
+        </div>
+        <div class="sbox">
+          <div class="sval" id="sc-p" style="color:var(--accent)">0</div>
+          <div class="slbl">Target reached<br><span style="font-size:8px">sans retour</span></div>
+        </div>
+        <div class="sbox" style="grid-column:1/-1">
+          <div class="sval" id="sc-t" style="color:var(--text)">0 / 0</div>
+          <div class="slbl">Essais</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-lbl">Chronologie d'un essai</div>
+      <div class="prow"><span class="pname">① Atteinte cible</span>
+        <span class="pval" style="color:var(--accent)">1 600 ms</span></div>
+      <div class="prow"><span class="pname">② Maintien (cercle bleu)</span>
+        <span class="pval" style="color:var(--blue)">1 600 ms</span></div>
+      <div class="prow"><span class="pname">③ Retour (cercle blanc)</span>
+        <span class="pval" style="color:#fff">1 600 ms</span></div>
+      <div class="prow"><span class="pname">Essais / bloc</span>
+        <span class="pval">3</span></div>
+      <div class="prow"><span class="pname">Blocs total</span>
+        <span class="pval" style="color:var(--accent)">20</span></div>
+      <div class="prow"><span class="pname">Pause inter-bloc</span>
+        <span class="pval">4 800 ms</span></div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-lbl">Assistance motrice</div>
+      <div class="trow">
+        <span class="tname">Activée</span>
+        <div class="tog on" id="tog-assist" onclick="toggleAssist()"></div>
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-hdr">
+          <span class="ctrl-name">Délai déclenchement</span>
+          <span class="ctrl-val" id="lbl-still">200 ms</span>
+        </div>
+        <input type="range" min="100" max="2000" step="100" value="200"
+          oninput="cfg.assistStillMs=+this.value;
+                   document.getElementById('lbl-still').textContent=this.value+' ms'">
+      </div>
+      <div class="ctrl">
+        <div class="ctrl-hdr">
+          <span class="ctrl-name">Vitesse glissement</span>
+          <span class="ctrl-val" id="lbl-travel">1 000 ms</span>
+        </div>
+        <input type="range" min="100" max="8000" step="100" value="1000"
+          oninput="cfg.assistTravelMs=+this.value;
+                   document.getElementById('lbl-travel').textContent=
+                   (+this.value).toLocaleString('fr')+' ms'">
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-lbl">Contrôles</div>
+      <div class="brow">
+        <button class="btn btn-p" onclick="startDemo()">Démarrer</button>
+        <button class="btn btn-g" onclick="resetDemo()">Reset</button>
+      </div>
+    </div>
+
+    <div class="sec" style="flex:1;min-height:0">
+      <div class="sec-lbl">Journal</div>
+      <div id="log"></div>
+    </div>
+  </aside>
+
+  <main id="canvas-area">
+    <canvas id="gc"></canvas>
+
+    <div id="hud">
+      <div id="pips"></div>
+      <div id="prog-wrap">
+        <div id="prog-lbl">—</div>
+        <div id="prog-track"><div id="prog-fill"></div></div>
+      </div>
+      <div id="phase-bar-wrap">
+        <div id="phase-lbl"></div>
+        <div id="phase-track"><div id="phase-fill"></div></div>
+      </div>
+    </div>
+
+    <div id="overlay">
+      <div class="ov-title">MOTIF-STROKE</div>
+      <div class="ov-sub">
+        Paradigme de rééducation motrice pour AVC.<br><br>
+        <strong>① </strong>Déplacez la <strong>croix noire</strong> vers le
+        <strong style="color:rgb(250,150,25)">cercle orange</strong> en 1,6 s.<br>
+        <strong>② </strong>Quand il devient
+        <strong style="color:rgb(25,177,250)">bleu</strong>, maintenez la position 1,6 s.<br>
+        <strong>③ </strong>Revenez au centre quand le
+        <strong style="color:#fff">cercle blanc</strong> apparaît.
+      </div>
+      <div class="ov-hint">Cliquez sur <strong>Démarrer</strong> pour lancer</div>
+    </div>
+  </main>
+
+</div>
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// CONFIG — mirrors Python constants exactly
+// ═══════════════════════════════════════════════════════════════════════
+const cfg = {
+  xSpan:         0.6,
+  targetRadius:  55,
+  centerRadius:  70,
+  yCursorFactor: 0.55,
+  // timing
+  reachMs:       1600,
+  dwellMs:       1600,
+  returnMs:      1600,
+  pauseMs:       4800,
+  startMs:       2000,
+  // colours
+  BG:     'rgb(127,127,127)',
+  ORANGE: 'rgb(250,150,25)',
+  BLUE:   'rgb(25,177,250)',
+  GREY:   'rgb(192,192,192)',
+  WHITE:  'rgb(255,255,255)',
+  BLACK:  'rgb(0,0,0)',
+  GRID:   'rgba(150,150,150,0.4)',
+  // assistance
+  assistEnabled: true,
+  assistStillMs: 200,
+  assistStillThr:0.02,
+  assistTravelMs:1000,
+  // sequence
+  elevAngles:    [-30,-15,0,15,30],
+  repsPerAngle:  2,
+  nBlock:        20,
+  nStimPerBlock: 3,
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// CANVAS
+// ═══════════════════════════════════════════════════════════════════════
+const canvas = document.getElementById('gc');
+const ctx    = canvas.getContext('2d');
+const area   = document.getElementById('canvas-area');
+
+function resize() {
+  const S = Math.min(area.clientWidth - 40, area.clientHeight - 80, 700);
+  canvas.width = canvas.height = S;
+}
+resize();
+window.addEventListener('resize', resize);
+
+const W      = () => canvas.width;
+const OX     = () => W() / 2;   // canvas centre x
+const OY     = () => W() / 2;   // canvas centre y
+const RADIAL = () => cfg.xSpan * W() / 2;
+const TGTR   = () => cfg.targetRadius  * W() / 700;
+const CTRR   = () => cfg.centerRadius  * W() / 700;
+const LW     = () => Math.max(3, W() * 0.006);
+
+// ═══════════════════════════════════════════════════════════════════════
+// SEQUENCE — mirrors Python make_block_sequence
+// ═══════════════════════════════════════════════════════════════════════
+function lcg(seed) {
+  let s = seed >>> 0;
+  return () => { s = (Math.imul(1664525, s) + 1013904223) >>> 0; return s / 0x100000000; };
+}
+function shuffle(arr, rng) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function isValid(seq) {
+  for (let i = 1; i < seq.length; i++)
+    if (seq[i].side === seq[i-1].side && seq[i].angle === seq[i-1].angle) return false;
+  for (let i = 3; i < seq.length; i++) {
+    const sides = seq.slice(i - 3, i + 1).map(b => b.side);
+    if (new Set(sides).size === 1) return false;
+  }
+  for (const idx of [2, 3])
+    if (idx < seq.length && seq[idx].angle === 0) return false;
+  return true;
+}
+function makePool(side) {
+  const pool = [];
+  for (const a of cfg.elevAngles)
+    for (let r = 0; r < cfg.repsPerAngle; r++) pool.push({ side, angle: a });
+  const i = pool.findIndex(b => b.angle === 0);
+  pool.splice(i, 1);
+  return pool;
+}
+function makeSeq(seed = 1) {
+  const rng    = lcg(seed);
+  const warmup = [{ side: 'L', angle: 0 }, { side: 'R', angle: 0 }];
+  const pool   = [...makePool('L'), ...makePool('R')];
+  for (let t = 0; t < 20000; t++) {
+    const sh   = shuffle(pool, rng);
+    const full = [...warmup, ...sh];
+    if (isValid(full)) return full;
+  }
+  return [...warmup, ...shuffle(pool, lcg(seed + 99))];
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// GAMEPAD
+// ═══════════════════════════════════════════════════════════════════════
+let gpIdx = null;
+window.addEventListener('gamepadconnected',    e => { gpIdx = e.gamepad.index; gpStatus(true); });
+window.addEventListener('gamepaddisconnected', e => { gpIdx = null; gpStatus(false); });
+function gpStatus(on) {
+  const el = document.getElementById('gp-status');
+  el.textContent = on ? '🎮 manette' : '🖱 souris';
+  el.className   = on ? 'on' : '';
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MOUSE INPUT
+// rawX / rawY : normalised -1..+1, updated only on mousemove over canvas
+// mouseReady  : false until first mousemove — cursor stays at centre
+// ═══════════════════════════════════════════════════════════════════════
+let anchorRawX = 0, anchorRawY = 0;  // raw values captured at start of RETURN
+let anchorCurX = 0, anchorCurY = 0;  // cursor position at start of RETURN
+
+canvas.addEventListener('mousemove', e => {
+  const r = canvas.getBoundingClientRect();
+  rawX = Math.max(-1, Math.min(1, (e.clientX - r.left - W() / 2) / (W() / 2)));
+  rawY = Math.max(-1, Math.min(1, -(e.clientY - r.top  - W() / 2) / (W() / 2)));
+  mouseReady = true;
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// PHASE STATE MACHINE
+//
+// Per-trial sequence:
+//   REACH  (1600 ms) — orange target, cross starts at screen centre,
+//                      patient moves cross toward target.
+//                      On hit → immediately enter DWELL.
+//                      On timeout without hit → enter RETURN.
+//
+//   DWELL  (1600 ms) — target turns blue, cross frozen at target centre.
+//                      After 1600 ms → enter RETURN.
+//
+//   RETURN (1600 ms) — white central circle appears (cue to return).
+//                      Cross is free. Patient moves cross back to centre.
+//                      After 1600 ms → tally outcome, next trial or block.
+//
+//   PAUSE  (4800 ms) — rest between blocks.
+//   START  (2000 ms) — initial fixation at session start.
+// ═══════════════════════════════════════════════════════════════════════
+const P = { IDLE:'idle', START:'start', REACH:'reach',
+            DWELL:'dwell', RETURN:'return', PAUSE:'pause', DONE:'done' };
+
+let phase      = P.IDLE;
+let phaseStart = 0;
+let phaseDur   = 0;
+
+// block / trial indices
+let blockSeq = [], iBlock = 0, iStim = 0, blockResults = [];
+
+// cursor position — screen coords relative to canvas centre
+let curX = 0, curY = 0;
+
+// target position — screen coords relative to canvas centre
+let tgtX = 0, tgtY = 0;
+
+// per-trial outcome flags
+let hit      = false;   // cross entered lateral target during REACH
+let returned = false;   // cross entered centre during RETURN
+
+// cumulative scores
+let nSuccess = 0, nPartial = 0, nTries = 0;
+
+// assistance state
+let assistOn    = false;
+let assistSince = null;
+let assistLogged = false;
+let assistPhaseActive = false;   // true only during REACH (before hit)
+
+let rafId = null;
+
+// ─── UI helpers ────────────────────────────────────────────────────────────
+function setBadge(txt, cls = '') {
+  const b = document.getElementById('badge');
+  b.textContent = txt; b.className = cls;
+}
+function addLog(msg, cls = '') {
+  const el = document.getElementById('log');
+  const d  = document.createElement('div');
+  d.className = 'le ' + cls;
+  d.innerHTML = `<span class="t">${(performance.now()/1000).toFixed(2)}s</span>`
+              + `<span class="m">${msg}</span>`;
+  el.prepend(d);
+  while (el.children.length > 80) el.removeChild(el.lastChild);
+}
+function refreshScores() {
+  document.getElementById('sc-s').textContent = nSuccess;
+  document.getElementById('sc-p').textContent = nPartial;
+  document.getElementById('sc-t').textContent = `${nSuccess + nPartial} / ${nTries}`;
+}
+function refreshPips() {
+  const wrap = document.getElementById('pips');
+  wrap.innerHTML = '';
+  for (let i = 0; i < cfg.nStimPerBlock; i++) {
+    const d = document.createElement('div');
+    const r = blockResults[i];
+    d.className = 'pip' + (
+      r === undefined ? (i === iStim ? ' active' : '') :
+      r === 'success' ? ' success' : r === 'partial' ? ' partial' : ' fail'
+    );
+    wrap.appendChild(d);
+  }
+}
+function setPhaseBar(elapsed, dur, label, color) {
+  const pct = Math.min(100, elapsed / dur * 100);
+  const pf  = document.getElementById('phase-fill');
+  pf.style.width      = pct + '%';
+  pf.style.background = color;
+  document.getElementById('phase-lbl').textContent =
+    `${label} : ${Math.max(0, (dur - elapsed) / 1000).toFixed(1)} s`;
+}
+function setProgBar() {
+  const total = cfg.nBlock * cfg.nStimPerBlock;
+  const done  = iBlock * cfg.nStimPerBlock + iStim;
+  document.getElementById('prog-fill').style.width = (done / total * 100) + '%';
+  document.getElementById('prog-lbl').textContent  =
+    `Bloc ${Math.min(iBlock + 1, cfg.nBlock)} / ${cfg.nBlock} — `
+    + `essai ${iStim + 1} / ${cfg.nStimPerBlock}`;
+}
+function dist(ax, ay, bx, by) { return Math.sqrt((ax-bx)**2 + (ay-by)**2); }
+
+// ─── cursor ────────────────────────────────────────────────────────────────
+function resetCursor() {
+  curX = 0; curY = 0;
+  rawX = 0; rawY = 0; prevRawX = 0; prevRawY = 0;
+  mouseReady = false;
+}
+function applyCursor() {
+  // apply raw mouse/gamepad mapping only after first move
+  if (mouseReady) {
+    curX = rawX * W() / 2;
+    curY = rawY * cfg.yCursorFactor * W() / 2;
+  }
+}
+
+// ─── assistance ───────────────────────────────────────────────────────────
+function resetAssist(active) {
+  assistOn = false; assistSince = null; assistLogged = false;
+  assistPhaseActive = active;
+}
+
+// Shared stillness detector — returns true and activates assistOn when
+// the patient has been still for long enough.
+function detectStillness() {
+  const t    = performance.now();
+  const disp = Math.sqrt((rawX - prevRawX)**2 + (rawY - prevRawY)**2);
+  if (disp > cfg.assistStillThr) {
+    if (assistOn) addLog('Assistance annulée — mouvement', 'ast');
+    assistOn = false; assistSince = t; assistLogged = false;
+  } else {
+    if (!assistSince) assistSince = t;
+    if (t - assistSince >= cfg.assistStillMs) {
+      if (!assistOn) assistOn = true;
+      if (!assistLogged) {
+        addLog(`Assistance active (${(t - assistSince).toFixed(0)} ms)`, 'ast');
+        assistLogged = true;
+      }
+    }
+  }
+}
+
+// During REACH: nudge cursor toward lateral target.
+// Returns true if assistance moved the cursor this frame.
+function runAssist() {
+  if (!cfg.assistEnabled || !assistPhaseActive || hit) return false;
+  detectStillness();
+  if (assistOn) {
+    const dx = tgtX - curX, dy = tgtY - curY;
+    const d  = Math.sqrt(dx*dx + dy*dy);
+    if (d > 0.5) {
+      const step = d / (cfg.assistTravelMs / 16);
+      curX += dx / d * step;
+      curY += dy / d * step;
+      return true;
+    }
+  }
+  return false;
+}
+
+// During RETURN: nudge cursor toward screen centre (0, 0).
+// Returns true if assistance moved the cursor this frame.
+function runAssistReturn() {
+  if (!cfg.assistEnabled || !assistPhaseActive || returned) return false;
+  detectStillness();
+  if (assistOn) {
+    const dx = 0 - curX, dy = 0 - curY;
+    const d  = Math.sqrt(dx*dx + dy*dy);
+    if (d > 0.5) {
+      const step = d / (cfg.assistTravelMs / 16);
+      curX += dx / d * step;
+      curY += dy / d * step;
+      return true;
+    }
+  }
+  return false;
+}
+
+// ─── phase transitions ────────────────────────────────────────────────────
+function goPhase(p, dur) { phase = p; phaseStart = performance.now(); phaseDur = dur; }
+
+function doStart() {
+  goPhase(P.START, cfg.startMs);
+  setBadge('Fixation initiale', '');
+  resetCursor();
+  resetAssist(false);
+}
+
+function doReach() {
+  // compute target for current block
+  const blk = blockSeq[iBlock];
+  const th   = blk.angle * Math.PI / 180;
+  const r    = RADIAL();
+  tgtX = (blk.side === 'L' ? -1 : 1) * r * Math.cos(th);
+  tgtY = r * Math.sin(th);
+  hit      = false;
+  returned = false;
+  resetCursor();       // cross starts at screen centre
+  resetAssist(true);   // arm assistance
+  const side = blk.side === 'L' ? 'Gauche' : 'Droite';
+  const ang  = (blk.angle >= 0 ? '+' : '') + blk.angle + '°';
+  setBadge(`Atteinte — ${side} ${ang}`, 'reach');
+  addLog(`Bloc ${iBlock+1}/20 — ${side} ${ang} — essai ${iStim+1}/${cfg.nStimPerBlock}`, 'inf');
+  refreshPips();
+  setProgBar();
+  goPhase(P.REACH, cfg.reachMs);
+}
+
+function doDwell() {
+  // cross freezes at target centre — circle becomes blue
+  curX = tgtX; curY = tgtY;
+  resetAssist(false);
+  setBadge('Maintien…', 'dwell');
+  addLog('Cible atteinte — maintien 1,6 s', 'ok');
+  goPhase(P.DWELL, cfg.dwellMs);
+}
+
+function doReturn() {
+  anchorRawX = rawX; anchorRawY = rawY;
+  anchorCurX = curX; anchorCurY = curY;
+  resetAssist(true);   // arm assistance for the return journey
+  setBadge('Retour au centre', 'return');
+  goPhase(P.RETURN, cfg.returnMs);
+}
+
+function doEndTrial() {
+  nTries++;
+  const full    = hit && returned;
+  const partial = hit && !returned;
+  if (full)    nSuccess++;
+  if (partial) nPartial++;
+  blockResults[iStim] = full ? 'success' : partial ? 'partial' : 'fail';
+  refreshScores();
+  refreshPips();
+  addLog(`Essai ${iStim+1}: ${full ? '✓ SUCCESS' : partial ? '~ TARGET REACHED' : '✗ FAILED'}`,
+         full ? 'ok' : partial ? 'inf' : 'err');
+  iStim++;
+  if (iStim >= cfg.nStimPerBlock) {
+    iStim = 0; iBlock++; blockResults = [];
+    if (iBlock >= blockSeq.length) {
+      goPhase(P.DONE, 0);
+      setBadge('Terminé ✓', 'done');
+      addLog('── Session terminée', 'inf');
+      document.getElementById('prog-fill').style.width = '100%';
+      draw(); return;
+    }
+    resetCursor();
+    resetAssist(false);
+    setBadge('Pause', 'pause');
+    addLog(`Pause inter-bloc (${cfg.pauseMs/1000} s)`, 'inf');
+    goPhase(P.PAUSE, cfg.pauseMs);
+  } else {
+    doReach();
+  }
+}
+
+// ─── public controls ──────────────────────────────────────────────────────
+function startDemo() {
+  document.getElementById('overlay').classList.add('hidden');
+  blockSeq = makeSeq(1);
+  iBlock = 0; iStim = 0; blockResults = [];
+  nSuccess = 0; nPartial = 0; nTries = 0;
+  document.getElementById('log').innerHTML = '';
+  refreshScores(); refreshPips();
+  addLog('── Session démarrée', 'inf');
+  doStart();
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = requestAnimationFrame(loop);
+}
+
+function resetDemo() {
+  if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+  phase = P.IDLE;
+  document.getElementById('overlay').classList.remove('hidden');
+  setBadge('En attente', '');
+  document.getElementById('prog-fill').style.width = '0%';
+  document.getElementById('prog-lbl').textContent  = '—';
+  document.getElementById('phase-lbl').textContent = '';
+  document.getElementById('phase-fill').style.width = '0%';
+  document.getElementById('pips').innerHTML = '';
+  nSuccess = 0; nPartial = 0; nTries = 0; refreshScores();
+  document.getElementById('log').innerHTML = '';
+  resetCursor(); draw();
+}
+
+function toggleAssist() {
+  cfg.assistEnabled = !cfg.assistEnabled;
+  document.getElementById('tog-assist').classList.toggle('on', cfg.assistEnabled);
+  addLog(`Assistance ${cfg.assistEnabled ? 'activée' : 'désactivée'}`, 'ast');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// MAIN LOOP
+// ═══════════════════════════════════════════════════════════════════════
+function loop() {
+  const now     = performance.now();
+  const elapsed = now - phaseStart;
+
+  // read gamepad axes if connected
+  if (gpIdx !== null) {
+    const gp = navigator.getGamepads()[gpIdx];
+    if (gp) { rawX = gp.axes[0]; rawY = -gp.axes[1]; mouseReady = true; }
+  }
+
+  // ── REACH ──────────────────────────────────────────────────────────
+  if (phase === P.REACH) {
+    const assisted = runAssist();
+    if (!assisted) applyCursor();
+
+    if (!hit && dist(curX, curY, tgtX, tgtY) < TGTR()) {
+      hit = true;
+      doDwell();
+      // fall through to draw immediately
+    } else {
+      setPhaseBar(elapsed, phaseDur, 'Atteinte', 'var(--accent)');
+      if (elapsed >= phaseDur) doReturn();   // timeout — missed
+    }
+
+  // ── DWELL ──────────────────────────────────────────────────────────
+  } else if (phase === P.DWELL) {
+    // cursor stays frozen at tgtX/tgtY — no input applied
+    curX = tgtX; curY = tgtY;
+    setPhaseBar(elapsed, phaseDur, 'Maintien', 'var(--blue)');
+    if (elapsed >= phaseDur) doReturn();
+
+  // ── RETURN ─────────────────────────────────────────────────────────
+  } else if (phase === P.RETURN) {
+    if (!returned) {
+      const assistedReturn = runAssistReturn();
+      if (!assistedReturn) {
+        // delta-based mapping: cross moves by how much mouse moved since RETURN start
+        const dRawX = rawX - anchorRawX;
+        const dRawY = rawY - anchorRawY;
+        curX = anchorCurX + dRawX * W() / 2;
+        curY = anchorCurY + dRawY * cfg.yCursorFactor * W() / 2;
+      } else {
+        // assistance is moving the cursor — keep anchor in sync so that
+        // if the patient takes over, there is no jump
+        anchorRawX = rawX; anchorRawY = rawY;
+        anchorCurX = curX; anchorCurY = curY;
+      }
+      if (dist(curX, curY, 0, 0) < CTRR()) {
+        returned = true;
+        curX = 0; curY = 0;
+        addLog('Retour au centre ✓', 'ok');
+      }
+    }
+    // once returned, freeze cross at centre
+    if (returned) { curX = 0; curY = 0; }
+    setPhaseBar(elapsed, phaseDur, 'Retour', '#fff');
+    if (elapsed >= phaseDur) doEndTrial();
+
+  // ── PAUSE ──────────────────────────────────────────────────────────
+  } else if (phase === P.PAUSE) {
+    applyCursor();
+    const overall = iBlock * cfg.nStimPerBlock / (cfg.nBlock * cfg.nStimPerBlock);
+    document.getElementById('prog-fill').style.width = (overall * 100) + '%';
+    document.getElementById('prog-lbl').textContent  = `Pause — bloc ${iBlock+1}/20`;
+    setPhaseBar(elapsed, phaseDur, 'Pause', 'var(--border)');
+    if (elapsed >= phaseDur) { refreshPips(); doReach(); }
+
+  // ── START ──────────────────────────────────────────────────────────
+  } else if (phase === P.START) {
+    applyCursor();
+    setPhaseBar(elapsed, phaseDur, 'Départ', 'var(--border)');
+    if (elapsed >= phaseDur) { iBlock = 0; iStim = 0; doReach(); }
+  }
+
+  prevRawX = rawX; prevRawY = rawY;
+  draw();
+
+  if (phase !== P.IDLE && phase !== P.DONE)
+    rafId = requestAnimationFrame(loop);
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// DRAW
+// One draw function — clearly separated by phase so the rendering
+// exactly matches what is described in the task specification.
+// ═══════════════════════════════════════════════════════════════════════
+function drawCircleOutline(cx, cy, r, color) {
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = color;
+  ctx.fillStyle   = 'transparent';
+  ctx.lineWidth   = LW();
+  ctx.stroke();
+}
+
+function drawCross(cx, cy) {
+  const arm = Math.max(20, W() * 0.042);
+  ctx.strokeStyle = cfg.BLACK;
+  ctx.lineWidth   = Math.max(3, W() * 0.005);
+  ctx.lineCap     = 'round';
+  ctx.beginPath(); ctx.moveTo(cx - arm, cy); ctx.lineTo(cx + arm, cy); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy - arm); ctx.lineTo(cx, cy + arm); ctx.stroke();
+}
+
+function draw() {
+  const ox = OX(), oy = OY();
+
+  // background
+  ctx.fillStyle = cfg.BG;
+  ctx.fillRect(0, 0, W(), W());
+
+  // crosshair grid
+  ctx.strokeStyle = cfg.GRID; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(W()/2, 0);   ctx.lineTo(W()/2, W()); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, W()/2);   ctx.lineTo(W(), W()/2); ctx.stroke();
+
+  // ── REACH: orange circle (left or right, at elevation angle)
+  //           cross starts at screen centre and follows mouse
+  if (phase === P.REACH) {
+    drawCircleOutline(ox + tgtX, oy - tgtY, TGTR(), cfg.ORANGE);
+
+    // pulsing assistance halo
+    if (assistOn) {
+      const pulse = Math.sin(performance.now() / 380) * 5;
+      ctx.beginPath();
+      ctx.arc(ox + tgtX, oy - tgtY, TGTR() + 9 + pulse, 0, Math.PI * 2);
+      ctx.strokeStyle = cfg.BLUE + '66'; ctx.lineWidth = 2; ctx.stroke();
+    }
+
+    drawCross(ox + curX, oy - curY);
+  }
+
+  // ── DWELL: blue circle (same position), cross frozen at target centre
+  if (phase === P.DWELL) {
+    drawCircleOutline(ox + tgtX, oy - tgtY, TGTR(), cfg.BLUE);
+    drawCross(ox + tgtX, oy - tgtY);
+  }
+
+  // ── RETURN: white central circle, cross is free (patient returns)
+  //            circle turns blue once cursor is inside
+  if (phase === P.RETURN) {
+    drawCircleOutline(ox, oy, CTRR(), cfg.WHITE);
+    drawCross(ox + curX, oy - curY);
+  }
+
+  // ── START / PAUSE: grey central circle, cross follows mouse
+  if (phase === P.START || phase === P.PAUSE) {
+    drawCircleOutline(ox, oy, CTRR(), cfg.GREY);
+    drawCross(ox + curX, oy - curY);
+  }
+
+  // ── IDLE / DONE: static state
+  if (phase === P.IDLE || phase === P.DONE) {
+    drawCircleOutline(ox, oy, CTRR(), cfg.GREY);
+    drawCross(ox, oy);
+  }
+}
+
+// initial static render
+draw();
+</script>
+</body>
+</html>
